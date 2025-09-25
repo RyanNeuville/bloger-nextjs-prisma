@@ -1,32 +1,23 @@
 import { getSession } from "next-auth/react";
+import { getServerSession } from "next-auth/next";
 import prisma from "../../../lib/prisma";
+import { options } from "../auth/[...nextauth]";
 
-export default async function handler(req, res) {
+export default async function handle(req, res) {
   const { title, content } = req.body;
 
-  const session = await getSession({ req });
+  const session = await getServerSession(req, res, options);
   if (!session) {
-    return res.status(401).json({ message: "You must be logged in." });
+    return res.status(401).json({ error: "Not authenticated" });
   }
-
-  const email = session?.user?.email;
-  if (typeof email !== "string") {
-    return res
-      .status(400)
-      .json({ message: "User email is missing or invalid." });
-  }
-
   const result = await prisma.post.create({
     data: {
-      title,
+      title: title,
       content: content,
       author: {
-        connect: {
-          email: email,
-        },
+        connect: { email: session?.user?.email! },
       },
     },
   });
-
   res.json(result);
 }
