@@ -35,7 +35,7 @@ const Header: React.FC = () => {
     </div>
   );
 
-  let right = null;
+  let right: React.ReactNode = null;
 
   if (status === "loading") {
     left = (
@@ -143,7 +143,7 @@ const Header: React.FC = () => {
     right = (
       <div className="right">
         <p>
-          {session.user.name} ({session.user.email})
+          {session.user?.name} ({session.user?.email})
         </p>
         <Link href="/create">
           <button>
